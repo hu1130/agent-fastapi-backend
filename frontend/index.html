@@ -1,0 +1,606 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>企业智能体解决方案平台</title>
+    <style>
+      :root {
+        --ink: #17202a;
+        --muted: #5e6878;
+        --line: #d9e0e8;
+        --paper: #fff;
+        --soft: #f5f7fa;
+        --accent: #0f8b8d;
+        --accent-dark: #0a6266;
+        --blue: #2f5f98;
+        --gold: #ba7b16;
+        --shadow: 0 18px 50px rgba(23, 32, 42, 0.14);
+      }
+
+      * { box-sizing: border-box; }
+      html { scroll-behavior: smooth; }
+      body {
+        margin: 0;
+        min-width: 320px;
+        color: var(--ink);
+        background: var(--soft);
+        font-family: Arial, "Microsoft YaHei", sans-serif;
+      }
+      a { color: inherit; text-decoration: none; }
+      .topbar {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 24px;
+        padding: 16px clamp(18px, 4vw, 56px);
+        border-bottom: 1px solid rgba(217, 224, 232, 0.78);
+        background: rgba(255, 255, 255, 0.92);
+        backdrop-filter: blur(14px);
+      }
+      .brand { display: inline-flex; align-items: center; gap: 10px; font-weight: 700; }
+      .brand-mark {
+        display: grid;
+        width: 34px;
+        height: 34px;
+        place-items: center;
+        border-radius: 8px;
+        color: #fff;
+        background: var(--accent);
+        font-size: 14px;
+      }
+      .nav { display: flex; gap: 22px; color: var(--muted); font-size: 14px; }
+      .nav a:hover { color: var(--accent-dark); }
+      .hero {
+        display: grid;
+        grid-template-columns: minmax(0, 0.92fr) minmax(360px, 1.08fr);
+        gap: clamp(28px, 5vw, 72px);
+        align-items: center;
+        min-height: calc(100vh - 67px);
+        padding: clamp(36px, 6vw, 76px) clamp(18px, 4vw, 56px);
+        background:
+          linear-gradient(110deg, rgba(255, 255, 255, 0.94) 0%, rgba(245, 247, 250, 0.88) 48%, rgba(231, 241, 239, 0.78) 100%),
+          url("https://images.unsplash.com/photo-1551434678-e076c223a692?auto=format&fit=crop&w=1800&q=80") center/cover;
+      }
+      .hero-copy { max-width: 680px; }
+      .eyebrow, .kicker { margin: 0 0 12px; color: var(--accent-dark); font-size: 13px; font-weight: 700; }
+      h1, h2, h3, h4, p { margin-top: 0; }
+      h1 { max-width: 760px; margin-bottom: 18px; font-size: clamp(38px, 6vw, 72px); line-height: 1.05; letter-spacing: 0; }
+      .lead { max-width: 660px; color: var(--muted); font-size: 18px; line-height: 1.75; }
+      .hero-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
+      .primary-action, .secondary-action, button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 44px;
+        border-radius: 8px;
+        border: 1px solid transparent;
+        padding: 0 18px;
+        font-weight: 700;
+        cursor: pointer;
+      }
+      .primary-action, button { color: #fff; background: var(--accent); }
+      .primary-action:hover, button:hover { background: var(--accent-dark); }
+      .secondary-action { border-color: var(--line); background: #fff; }
+      .chat-shell, .agent-form, .agent-result, .quote-card, .quote-table-wrap, .result-card {
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.96);
+      }
+      .chat-shell { overflow: hidden; box-shadow: var(--shadow); }
+      .chat-header, .result-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 18px;
+        padding: 20px;
+        border-bottom: 1px solid var(--line);
+      }
+      .chat-header h2, .result-header h3 { margin: 0; font-size: 22px; }
+      .status {
+        border-radius: 999px;
+        padding: 6px 10px;
+        color: #0d5d38;
+        background: #dff5e9;
+        font-size: 13px;
+        font-weight: 700;
+      }
+      .chat-body {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        height: min(54vh, 520px);
+        min-height: 390px;
+        overflow-y: auto;
+        padding: 20px;
+      }
+      .message {
+        max-width: 86%;
+        border-radius: 8px;
+        padding: 13px 14px;
+        line-height: 1.65;
+        white-space: pre-line;
+      }
+      .message.agent { align-self: flex-start; border: 1px solid var(--line); background: #fff; }
+      .message.user { align-self: flex-end; color: #fff; background: var(--blue); }
+      .quick-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+      .quick-actions button {
+        min-height: auto;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        padding: 9px 12px;
+        color: var(--ink);
+        background: #fff;
+      }
+      .composer {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 12px;
+        padding: 16px;
+        border-top: 1px solid var(--line);
+        background: #f9fafc;
+      }
+      textarea, input, select {
+        width: 100%;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 12px;
+        color: var(--ink);
+        background: #fff;
+        font: inherit;
+      }
+      textarea { resize: vertical; }
+      textarea:focus, input:focus, select:focus {
+        outline: 2px solid rgba(15, 139, 141, 0.22);
+        border-color: var(--accent);
+      }
+      .insight-band {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1px;
+        padding: clamp(34px, 5vw, 64px) clamp(18px, 4vw, 56px);
+        background: var(--ink);
+      }
+      .insight { min-height: 132px; padding: 24px; color: #fff; background: #24303d; }
+      .insight strong { display: block; margin-bottom: 10px; font-size: 20px; }
+      .insight span { color: #dce5ec; line-height: 1.65; }
+      .video-agent-section, .pricing-section, .process {
+        padding: clamp(34px, 5vw, 64px) clamp(18px, 4vw, 56px);
+      }
+      .video-agent-section { border-top: 1px solid var(--line); background: #f5f7fa; }
+      .pricing-section, .process { background: #fff; }
+      .section-heading {
+        display: flex;
+        align-items: end;
+        justify-content: space-between;
+        gap: 24px;
+        max-width: 1180px;
+        margin: 0 auto 24px;
+      }
+      .section-heading h2, .process h2 { margin-bottom: 0; font-size: clamp(28px, 4vw, 42px); }
+      .section-note { max-width: 360px; color: var(--muted); line-height: 1.6; }
+      .video-agent-grid, .quote-grid {
+        display: grid;
+        grid-template-columns: minmax(280px, 420px) minmax(0, 1fr);
+        gap: 22px;
+        max-width: 1180px;
+        margin: 0 auto;
+      }
+      .agent-form { display: grid; gap: 14px; padding: 20px; }
+      .agent-form label { display: grid; gap: 8px; font-size: 14px; font-weight: 700; }
+      .form-row { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+      .checkbox-line { display: flex !important; align-items: center; gap: 8px !important; }
+      .checkbox-line input { width: auto; }
+      .form-hint { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.6; }
+      .agent-result { overflow: hidden; }
+      .video-output { display: grid; gap: 16px; padding: 20px; }
+      .empty-state { min-height: 280px; place-items: center; color: var(--muted); text-align: center; line-height: 1.8; }
+      .result-card { padding: 18px; }
+      .result-card h4 { margin-bottom: 10px; font-size: 20px; }
+      .result-card p { margin-bottom: 8px; color: var(--muted); line-height: 1.7; }
+      .asset-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; }
+      .asset-grid figure { margin: 0; overflow: hidden; border: 1px solid var(--line); border-radius: 8px; background: #fff; }
+      .asset-grid img { display: block; width: 100%; aspect-ratio: 1; object-fit: cover; }
+      .asset-grid figcaption { padding: 10px; color: var(--muted); font-size: 13px; }
+      .video-list { display: grid; gap: 14px; }
+      .video-list article { border: 1px solid var(--line); border-radius: 8px; padding: 14px; background: #fff; }
+      .video-list video { display: block; width: 100%; max-height: 420px; border-radius: 8px; background: #111; }
+      .video-list a { display: inline-flex; margin-top: 10px; color: var(--accent-dark); font-weight: 700; }
+      .warning-box { border: 1px solid #f1c27d; border-radius: 8px; padding: 12px; color: #744600; background: #fff7e8; line-height: 1.6; }
+      .quote-card { padding: 24px; }
+      .quote-card.recommended { border-color: rgba(15, 139, 141, 0.45); background: #f3fbfa; }
+      .tag { display: inline-flex; margin-bottom: 18px; border-radius: 999px; padding: 7px 10px; color: #fff; background: var(--gold); font-size: 12px; font-weight: 700; }
+      .quote-card p { color: var(--muted); line-height: 1.7; }
+      .price { display: block; margin-top: 24px; font-size: 25px; }
+      .quote-table-wrap { overflow-x: auto; }
+      .quote-table { width: 100%; min-width: 620px; border-collapse: collapse; }
+      .quote-table th, .quote-table td { padding: 16px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+      .quote-table th { color: var(--muted); font-size: 13px; }
+      .quote-table tfoot td { border-bottom: 0; font-size: 18px; font-weight: 800; }
+      .process {
+        display: grid;
+        grid-template-columns: minmax(260px, 0.8fr) minmax(320px, 1.2fr);
+        gap: 36px;
+        border-top: 1px solid var(--line);
+      }
+      .process ol { display: grid; gap: 14px; margin: 0; padding-left: 22px; color: var(--muted); line-height: 1.8; }
+      .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; }
+      button:disabled { cursor: wait; opacity: 0.68; }
+      @media (max-width: 900px) {
+        .topbar { align-items: flex-start; flex-direction: column; }
+        .hero, .video-agent-grid, .quote-grid, .process { grid-template-columns: 1fr; }
+        .hero { min-height: auto; }
+        .insight-band { grid-template-columns: 1fr; }
+      }
+      @media (max-width: 560px) {
+        .nav { width: 100%; justify-content: space-between; gap: 8px; font-size: 13px; }
+        .composer, .form-row { grid-template-columns: 1fr; }
+        .message { max-width: 94%; }
+        .chat-body { min-height: 430px; }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="#agent" aria-label="返回首页">
+        <span class="brand-mark">AI</span>
+        <span>企业智能体解决方案</span>
+      </a>
+      <nav class="nav" aria-label="主导航">
+        <a href="#agent">方案顾问</a>
+        <a href="#videoAgent">短视频获客</a>
+        <a href="#pricing">订阅方案</a>
+        <a href="#contact">交付流程</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="hero" id="agent">
+        <div class="hero-copy">
+          <p class="eyebrow">智能体咨询 / 流程自动化 / 企业知识库</p>
+          <h1>让企业先和智能体聊清楚需求，再选择合适的自动化方案。</h1>
+          <p class="lead">面向企业流程简化、获客增长和内部效率提升，平台提供方案顾问 Agent、AI 短视频获客 Agent，并逐步接入客服、知识库、销售线索和流程自动化智能体。</p>
+          <div class="hero-actions">
+            <a class="primary-action" href="#chatInput">开始咨询</a>
+            <a class="secondary-action" href="#videoAgent">体验短视频 Agent</a>
+          </div>
+        </div>
+
+        <section class="chat-shell" aria-label="企业智能体方案顾问">
+          <div class="chat-header">
+            <div>
+              <p class="kicker">在线咨询</p>
+              <h2>企业智能体方案顾问</h2>
+            </div>
+            <span class="status">可用</span>
+          </div>
+          <div class="chat-body" id="chatLog" aria-live="polite"></div>
+          <form class="composer" id="chatForm">
+            <label class="sr-only" for="chatInput">请输入公司需求</label>
+            <textarea id="chatInput" rows="2" placeholder="例如：我们是制造业公司，想做客服、订单查询和内部知识库智能体，大约 80 人使用..."></textarea>
+            <button type="submit">发送</button>
+          </form>
+        </section>
+      </section>
+
+      <section class="insight-band" aria-label="平台能力">
+        <div class="insight"><strong>官网咨询转化</strong><span>方案顾问 Agent 收集行业、场景、系统和预算，自动推荐智能体方案。</span></div>
+        <div class="insight"><strong>短视频获客</strong><span>AI 短视频 Agent 生成选题、文案、配图和视频，用于抖音、视频号等渠道引流。</span></div>
+        <div class="insight"><strong>SaaS 订阅使用</strong><span>客户注册充值后使用企业智能体，后续接入权限、额度、账单和调用记录。</span></div>
+      </section>
+
+      <section class="video-agent-section" id="videoAgent">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">AI 短视频获客 Agent</p>
+            <h2>把企业服务变成可发布的获客短视频</h2>
+          </div>
+          <p class="section-note">当前接入 FastAPI：<code>POST /api/video-agent/generate</code></p>
+        </div>
+        <div class="video-agent-grid">
+          <form class="agent-form" id="videoForm">
+            <label>公司/品牌名称<input id="companyName" placeholder="例如：智流程科技"></label>
+            <label>行业<input id="industry" placeholder="例如：制造业、零售、电商、政企服务"></label>
+            <label>产品/服务<input id="productName" placeholder="例如：企业智能体 SaaS 平台"></label>
+            <label>核心卖点<textarea id="sellingPoints" rows="3" placeholder="例如：客服自动化、知识库问答、ERP/OA 对接、流程审批自动化"></textarea></label>
+            <div class="form-row">
+              <label>发布平台<select id="platform"><option>抖音</option><option>视频号</option><option>小红书</option><option>B站</option></select></label>
+              <label>视频时长<input id="videoDuration" type="number" min="3" max="180" value="5"></label>
+            </div>
+            <div class="form-row">
+              <label>文案数量<input id="copyCount" type="number" min="1" max="5" value="3"></label>
+              <label>图片数量<input id="imageCount" type="number" min="0" max="4" value="2"></label>
+            </div>
+            <label class="checkbox-line"><input id="generateVideo" type="checkbox" checked> 同时生成视频</label>
+            <button type="submit">生成短视频方案</button>
+            <p class="form-hint">生成视频会调用外部模型，可能需要几十秒到数分钟。正式 SaaS 版本会放到注册充值后的工作台里。</p>
+          </form>
+          <section class="agent-result" aria-live="polite">
+            <div class="result-header">
+              <div>
+                <p class="kicker">生成结果</p>
+                <h3 id="videoResultTitle">等待生成</h3>
+              </div>
+              <span class="status" id="videoStatus">待提交</span>
+            </div>
+            <div id="videoOutput" class="video-output empty-state">填写企业信息后，AI 短视频获客 Agent 会返回短视频标题、脚本、话题标签、图片和视频链接。</div>
+          </section>
+        </div>
+      </section>
+
+      <section class="pricing-section" id="pricing">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">订阅方案</p>
+            <h2>咨询免费，登录充值后使用完整智能体能力</h2>
+          </div>
+        </div>
+        <div class="quote-grid">
+          <article class="quote-card recommended" id="recommendedPlan">
+            <span class="tag">当前推荐</span>
+            <h3>标准型企业智能体方案</h3>
+            <p>适合已有明确业务场景，希望快速上线客服、知识库、销售线索或短视频获客智能体的企业。</p>
+            <strong class="price" id="priceRange">¥68,000 - ¥128,000</strong>
+          </article>
+          <div class="quote-table-wrap">
+            <table class="quote-table">
+              <thead><tr><th>报价项</th><th>说明</th><th>估算金额</th></tr></thead>
+              <tbody id="quoteRows"></tbody>
+              <tfoot><tr><td colspan="2">预计总价</td><td id="quoteTotal">¥68,000 - ¥128,000</td></tr></tfoot>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section class="process" id="contact">
+        <div>
+          <p class="eyebrow">交付流程</p>
+          <h2>从咨询到上线，四步走完。</h2>
+        </div>
+        <ol>
+          <li>方案顾问 Agent 初步收集行业、部门、流程、系统和预算。</li>
+          <li>顾问复核需求，确认数据权限、接口清单和上线周期。</li>
+          <li>搭建智能体、知识库和自动化流程，完成测试验收。</li>
+          <li>客户登录 SaaS 工作台，按订阅和充值额度调用智能体。</li>
+        </ol>
+      </section>
+    </main>
+
+    <script>
+      const API_BASE = window.location.origin;
+      const chatLog = document.querySelector("#chatLog");
+      const chatForm = document.querySelector("#chatForm");
+      const chatInput = document.querySelector("#chatInput");
+      const quoteRows = document.querySelector("#quoteRows");
+      const quoteTotal = document.querySelector("#quoteTotal");
+      const priceRange = document.querySelector("#priceRange");
+      const recommendedPlan = document.querySelector("#recommendedPlan");
+      const videoForm = document.querySelector("#videoForm");
+      const videoStatus = document.querySelector("#videoStatus");
+      const videoOutput = document.querySelector("#videoOutput");
+      const videoResultTitle = document.querySelector("#videoResultTitle");
+
+      const state = { industry: "", scenes: [], users: 50, integrations: 1, complexity: "standard", budget: "" };
+      const sceneKeywords = [
+        { key: "客服智能体", words: ["客服", "售后", "客户", "工单"] },
+        { key: "销售线索智能体", words: ["销售", "线索", "获客", "转化", "CRM"] },
+        { key: "企业知识库智能体", words: ["知识库", "文档", "制度", "培训", "内部"] },
+        { key: "数据分析智能体", words: ["数据", "报表", "分析", "BI", "经营"] },
+        { key: "流程自动化智能体", words: ["审批", "流程", "订单", "采购", "自动化"] },
+        { key: "短视频获客智能体", words: ["短视频", "抖音", "视频号", "内容", "引流"] },
+        { key: "系统集成智能体", words: ["ERP", "OA", "飞书", "钉钉", "企微", "接口"] },
+      ];
+      const quickPrompts = [
+        "我们想做客服和知识库智能体，大约 30 人使用，没有复杂系统接口。",
+        "我们是制造业，需要订单查询、ERP 对接和内部流程自动化，约 120 人使用。",
+        "我们想用 AI 短视频获客 Agent 做抖音引流，同时接 CRM 和企业微信。",
+      ];
+
+      function addMessage(role, text) {
+        const message = document.createElement("div");
+        message.className = `message ${role}`;
+        message.textContent = text;
+        chatLog.appendChild(message);
+        chatLog.scrollTop = chatLog.scrollHeight;
+      }
+
+      function addQuickActions() {
+        const wrap = document.createElement("div");
+        wrap.className = "quick-actions";
+        quickPrompts.forEach((prompt) => {
+          const button = document.createElement("button");
+          button.type = "button";
+          button.textContent = prompt;
+          button.addEventListener("click", () => {
+            chatInput.value = prompt;
+            chatInput.focus();
+          });
+          wrap.appendChild(button);
+        });
+        chatLog.appendChild(wrap);
+      }
+
+      function detectIndustry(text) {
+        const rules = [
+          ["制造业", ["制造", "工厂", "生产", "设备", "订单"]],
+          ["零售电商", ["零售", "电商", "门店", "会员", "商品"]],
+          ["教育培训", ["教育", "学校", "课程", "培训", "学员"]],
+          ["医疗健康", ["医疗", "医院", "患者", "诊疗", "健康"]],
+          ["金融服务", ["金融", "银行", "保险", "风控", "理财"]],
+          ["政企服务", ["政企", "政府", "园区", "公共服务"]],
+        ];
+        const match = rules.find(([, words]) => words.some((word) => text.includes(word)));
+        return match ? match[0] : state.industry || "通用企业服务";
+      }
+
+      function updateState(text) {
+        state.industry = detectIndustry(text);
+        sceneKeywords.forEach((scene) => {
+          if (scene.words.some((word) => text.includes(word)) && !state.scenes.includes(scene.key)) state.scenes.push(scene.key);
+        });
+        const userMatch = text.match(/(\d+)\s*(人|位|个账号|座席|员工)/);
+        if (userMatch) state.users = Number(userMatch[1]);
+        const budgetMatch = text.match(/预算\s*(\d+)\s*(万|w|W)?|(\d+)\s*(万|w|W)\s*以内/);
+        if (budgetMatch) state.budget = `${Number(budgetMatch[1] || budgetMatch[3])}万以内`;
+        const integrationWords = ["ERP", "OA", "CRM", "企微", "企业微信", "飞书", "钉钉", "接口", "数据库"];
+        state.integrations = Math.max(1, integrationWords.filter((word) => text.toLowerCase().includes(word.toLowerCase())).length);
+        if (state.users >= 120 || state.integrations >= 3 || text.includes("多部门") || text.includes("复杂")) state.complexity = "advanced";
+        else if (state.users <= 30 && state.integrations <= 1 && state.scenes.length <= 2) state.complexity = "starter";
+        else state.complexity = "standard";
+      }
+
+      function money(value) { return `¥${value.toLocaleString("zh-CN")}`; }
+
+      function calculateQuote() {
+        const sceneCount = Math.max(1, state.scenes.length);
+        const base = state.complexity === "advanced" ? 98000 : state.complexity === "starter" ? 38000 : 68000;
+        const sceneFee = Math.max(0, sceneCount - 1) * 22000;
+        const integrationFee = Math.max(0, state.integrations - 1) * 18000;
+        const userFee = state.users > 50 ? Math.ceil((state.users - 50) / 50) * 12000 : 0;
+        const trainingFee = state.complexity === "advanced" ? 26000 : 12000;
+        const low = base + sceneFee + integrationFee + userFee + trainingFee;
+        const high = Math.round(low * 1.42);
+        return {
+          rows: [
+            ["基础建设", "智能体架构、对话流程、权限角色、管理后台配置", base],
+            ["业务场景", `${sceneCount} 个核心场景：${state.scenes.join("、") || "需求访谈后确认"}`, sceneFee],
+            ["系统集成", `${state.integrations} 类系统或接口接入预估`, integrationFee],
+            ["账号规模", `${state.users} 人使用规模预估`, userFee],
+            ["上线培训", "测试验收、管理员培训、首月调优", trainingFee],
+          ],
+          low,
+          high,
+        };
+      }
+
+      function updateQuote() {
+        const quote = calculateQuote();
+        quoteRows.innerHTML = "";
+        quote.rows.forEach(([name, desc, amount]) => {
+          const row = document.createElement("tr");
+          row.innerHTML = `<td>${name}</td><td>${desc}</td><td>${amount ? money(amount) : "含基础范围"}</td>`;
+          quoteRows.appendChild(row);
+        });
+        const range = `${money(quote.low)} - ${money(quote.high)}`;
+        quoteTotal.textContent = range;
+        priceRange.textContent = range;
+        recommendedPlan.querySelector("h3").textContent =
+          state.complexity === "advanced" ? "定制型企业智能体方案" : state.complexity === "starter" ? "轻量型企业智能体方案" : "标准型企业智能体方案";
+      }
+
+      function buildReply() {
+        const scenes = state.scenes.length ? state.scenes.join("、") : "客服、知识库、短视频获客或流程自动化";
+        const quote = calculateQuote();
+        const missing = [];
+        if (!state.budget) missing.push("预算范围");
+        if (!state.scenes.length) missing.push("最优先上线的 1-3 个业务场景");
+        return [
+          `我先按“${state.industry}”为你整理需求。`,
+          `推荐方向：${scenes}。当前更适合 ${recommendedPlan.querySelector("h3").textContent}，预计 ${state.users} 人规模，${state.integrations} 类系统接入。`,
+          `报价草案：${money(quote.low)} - ${money(quote.high)}。这个区间包含方案设计、智能体搭建、知识库配置、基础集成、测试验收和首月调优。`,
+          missing.length ? `为了把报价收窄，请继续告诉我：${missing.join("、")}。` : "信息已经比较完整，下一步建议注册账号或预约 30 分钟需求复核。",
+        ].join("\n\n");
+      }
+
+      function escapeHtml(value) {
+        return String(value || "").replace(/[&<>"]/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[char]);
+      }
+
+      function renderVideoResult(data) {
+        const plans = data.copywriting || [];
+        const images = data.images || [];
+        const videos = data.videos || [];
+        const first = plans[0] || {};
+        videoResultTitle.textContent = first.title || data.topic || "生成完成";
+        const planHtml = plans.map((plan, index) => `
+          <article class="result-card">
+            <span class="tag">方案 ${index + 1}</span>
+            <h4>${escapeHtml(plan.title || "未命名方案")}</h4>
+            <p><strong>开场：</strong>${escapeHtml(plan.hook || plan.subtitle || "")}</p>
+            <p><strong>文案：</strong>${escapeHtml(plan.caption || plan.description || "")}</p>
+            <p><strong>标签：</strong>${(plan.hashtags || []).map(escapeHtml).join(" ")}</p>
+          </article>
+        `).join("");
+        const imageHtml = images.length ? `<div class="asset-grid">${images.map((item) => `<figure><img src="${item.url}" alt="${escapeHtml(item.label)}"><figcaption>${escapeHtml(item.label)}</figcaption></figure>`).join("")}</div>` : "";
+        const videoItems = videos.length ? videos : data.video_url ? [{ url: data.video_url, label: "生成视频" }] : [];
+        const videoHtml = videoItems.length ? `<div class="video-list">${videoItems.map((item) => {
+          const src = item.url.startsWith("http") ? `${API_BASE}/api/video-proxy?url=${encodeURIComponent(item.url)}` : `${API_BASE}${item.url}`;
+          return `<article><h4>${escapeHtml(item.label)}</h4><video controls src="${src}"></video><a href="${src}" target="_blank" rel="noreferrer">打开视频</a></article>`;
+        }).join("")}</div>` : "";
+        const warningHtml = (data.warnings || []).length ? `<div class="warning-box">${data.warnings.map(escapeHtml).join("<br>")}</div>` : "";
+        videoOutput.className = "video-output";
+        videoOutput.innerHTML = `${warningHtml}${planHtml}${imageHtml}${videoHtml}`;
+      }
+
+      chatForm.addEventListener("submit", (event) => {
+        event.preventDefault();
+        const text = chatInput.value.trim();
+        if (!text) return;
+        addMessage("user", text);
+        chatInput.value = "";
+        updateState(text);
+        updateQuote();
+        window.setTimeout(() => addMessage("agent", buildReply()), 360);
+      });
+      chatInput.addEventListener("keydown", (event) => {
+        if (event.key === "Enter" && !event.shiftKey) {
+          event.preventDefault();
+          chatForm.requestSubmit();
+        }
+      });
+
+      videoForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const button = videoForm.querySelector("button[type='submit']");
+        const payload = {
+          company_name: document.querySelector("#companyName").value.trim(),
+          industry: document.querySelector("#industry").value.trim(),
+          product_name: document.querySelector("#productName").value.trim(),
+          selling_points: document.querySelector("#sellingPoints").value.trim(),
+          platform: document.querySelector("#platform").value,
+          goal: "短视频获客引流",
+          tone: "专业可信",
+          copy_count: Number(document.querySelector("#copyCount").value || 3),
+          image_count: Number(document.querySelector("#imageCount").value || 0),
+          video_duration: Number(document.querySelector("#videoDuration").value || 5),
+          generate_video: document.querySelector("#generateVideo").checked,
+        };
+        if (!payload.product_name && !payload.selling_points) {
+          videoOutput.className = "video-output empty-state";
+          videoOutput.textContent = "请至少填写产品/服务或核心卖点。";
+          return;
+        }
+        button.disabled = true;
+        videoStatus.textContent = "生成中";
+        videoResultTitle.textContent = "正在调用 AI 短视频获客 Agent";
+        videoOutput.className = "video-output empty-state";
+        videoOutput.textContent = "正在生成文案、图片和视频，请稍等...";
+        try {
+          const response = await fetch(`${API_BASE}/api/video-agent/generate`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          });
+          const data = await response.json();
+          if (!response.ok) throw new Error(data.detail || "生成失败");
+          videoStatus.textContent = "已完成";
+          renderVideoResult(data);
+        } catch (error) {
+          videoStatus.textContent = "失败";
+          videoResultTitle.textContent = "生成失败";
+          videoOutput.className = "video-output empty-state";
+          videoOutput.textContent = `请确认后端已启动、密钥已配置。错误信息：${error.message}`;
+        } finally {
+          button.disabled = false;
+        }
+      });
+
+      addMessage("agent", "你好，我是企业智能体方案顾问。请告诉我贵公司的行业、想解决的流程问题、预计使用人数、是否需要对接 ERP/OA/CRM，以及预算范围。我会先给你一份方案和报价草案。也可以下滑体验 AI 短视频获客 Agent。一般正式使用会放到注册充值后的 SaaS 工作台里。");
+      addQuickActions();
+      updateQuote();
+    </script>
+  </body>
+</html>
