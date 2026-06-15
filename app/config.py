@@ -19,7 +19,7 @@ class Settings(BaseSettings):
     image_size: str = "1024*1024"
     video_provider: str = "qwen"
     video_model: str = "happyhorse-1.0-i2v"
-    video_duration: int = 5
+    video_duration: int = 30
 
     jimeng_api_key: str = ""
     jimeng_image_model: str = "jimeng_t2i_v40"
